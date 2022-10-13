@@ -8,3 +8,5 @@ ignore:
     - ".DS_Store"
     - ".git"
     - "node_modules"
+    - ".env"
+rootDirectoryName: "$$project root directory name$$"
