@@ -1,4 +1,8 @@
-# NFT project powered by CTO in ANIM.JP
+# NFT project powered by YUMENOSUKE
+
+Usage:
+
+This is a full-project template for [Cannon](https://github.com/GeneralD/cannon).
 
 Try running some of the following tasks:
 
