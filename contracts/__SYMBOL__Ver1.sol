@@ -33,7 +33,7 @@ contract __SYMBOL__Ver1 is
         isChiefMintPaused = false;
         isPublicMintPaused = true;
         isWhitelistMintPaused = true;
-        _royaltyFraction = $$royalty fraction in percentage$$00 // $$royalty fraction in percentage$$%
+        _royaltyFraction = $$royalty fraction in percentage$$00; // $$royalty fraction in percentage$$%
     }
 
     function _startTokenId() internal pure override returns (uint256) {
