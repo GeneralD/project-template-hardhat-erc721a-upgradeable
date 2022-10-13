@@ -1,0 +1,10 @@
+---
+delimiters:
+    - "__"
+constantDelimiters:
+    - "$$"
+ignore:
+    - "config.yml"
+    - ".DS_Store"
+    - ".git"
+    - "node_modules/"
