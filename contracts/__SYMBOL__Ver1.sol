@@ -445,6 +445,7 @@ contract __SYMBOL__Ver1 is
         payable(msg.sender).transfer(amountLeft);
     }
 
+    //## adminForceTransferFrom
     ///////////////////////////////////////////////////////////////////
     //// Force Transfer
     ///////////////////////////////////////////////////////////////////
@@ -593,7 +594,7 @@ contract __SYMBOL__Ver1 is
         uint24 extraData = uint24(prevOwnershipPacked >> BITPOS_EXTRA_DATA);
         return uint256(_extraData(from, to, extraData)) << BITPOS_EXTRA_DATA;
     }
-
+    //##
     ///////////////////////////////////////////////////////////////////
     //// Utilities
     ///////////////////////////////////////////////////////////////////

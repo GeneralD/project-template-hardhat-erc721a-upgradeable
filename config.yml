@@ -3,6 +3,8 @@ delimiters:
     - "__"
 constantDelimiters:
     - "$$"
+skipDelimiters:
+    - "//##"
 ignore:
     - "config.yml"
     - ".DS_Store"
