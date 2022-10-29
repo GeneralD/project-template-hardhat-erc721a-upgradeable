@@ -5,14 +5,14 @@ import { describe, it } from 'mocha'
 
 import { Latest__SYMBOL__, latest__SYMBOL__Factory } from './const'
 
-describe("__SYMBOL__ whitelist bonus", () => {
+describe("__SYMBOL__ allowlist bonus", () => {
   it("Check bonus", async () => {
     const __SYMBOL__ = await latest__SYMBOL__Factory
     const instance = await upgrades.deployProxy(__SYMBOL__) as Latest__SYMBOL__
 
     await instance.setMintLimit(100)
     const quantity = BigNumber.from(25)
-    const bonusPer = await instance.WHITELIST_BONUS_PER()
+    const bonusPer = await instance.ALLOWLIST_BONUS_PER()
     expect(await instance.bonusQuantity(quantity)).to.equal(quantity.add(quantity.div(bonusPer)))
   })
 

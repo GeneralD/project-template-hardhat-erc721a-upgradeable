@@ -8,29 +8,29 @@ import { describe, it } from 'mocha'
 import { Latest__SYMBOL__, latest__SYMBOL__Factory } from './const'
 
 describe("Pause __SYMBOL__", () => {
-    it("Toggle whitelist mint pausing", async () => {
+    it("Toggle allowlist mint pausing", async () => {
         const __SYMBOL__ = await latest__SYMBOL__Factory
         const instance = await upgrades.deployProxy(__SYMBOL__) as Latest__SYMBOL__
 
         // unpause if it's paused
-        if (await instance.isWhitelistMintPaused())
-            await instance.unpauseWhitelistMint()
+        if (await instance.isAllowlistMintPaused())
+            await instance.unpauseAllowlistMint()
 
-        await expect(instance.pauseWhitelistMint())
-            .to.emit(instance, "WhitelistMintPaused")
+        await expect(instance.pauseAllowlistMint())
+            .to.emit(instance, "AllowlistMintPaused")
 
-        expect(await instance.isWhitelistMintPaused()).is.true
+        expect(await instance.isAllowlistMintPaused()).is.true
 
-        await expect(instance.pauseWhitelistMint())
-            .to.revertedWith("whitelist mint: paused")
+        await expect(instance.pauseAllowlistMint())
+            .to.revertedWith("allowlist mint: paused")
 
-        await expect(instance.unpauseWhitelistMint())
-            .to.emit(instance, "WhitelistMintUnpaused")
+        await expect(instance.unpauseAllowlistMint())
+            .to.emit(instance, "AllowlistMintUnpaused")
 
-        expect(await instance.isWhitelistMintPaused()).is.false
+        expect(await instance.isAllowlistMintPaused()).is.false
 
-        await expect(instance.unpauseWhitelistMint())
-            .to.revertedWith("whitelist mint: not paused")
+        await expect(instance.unpauseAllowlistMint())
+            .to.revertedWith("allowlist mint: not paused")
     })
 
 
@@ -92,31 +92,31 @@ describe("Pause __SYMBOL__", () => {
 
         await expect(instance.connect(john).pauseChiefMint()).to.revertedWith("Ownable: caller is not the owner")
         await expect(instance.connect(john).pausePublicMint()).to.revertedWith("Ownable: caller is not the owner")
-        await expect(instance.connect(john).pauseWhitelistMint()).to.revertedWith("Ownable: caller is not the owner")
+        await expect(instance.connect(john).pauseAllowlistMint()).to.revertedWith("Ownable: caller is not the owner")
     })
 
-    it("Whitelist mint is not available if it's paused", async () => {
+    it("Allowlist mint is not available if it's paused", async () => {
         const __SYMBOL__ = await latest__SYMBOL__Factory
         const instance = await upgrades.deployProxy(__SYMBOL__) as Latest__SYMBOL__
         const [, john, jonny, jonathan] = await ethers.getSigners()
 
-        if (!(await instance.isWhitelistMintPaused())) await instance.pauseWhitelistMint()
+        if (!(await instance.isAllowlistMintPaused())) await instance.pauseAllowlistMint()
 
-        // register whitelist
-        const whitelisted = [john, jonny, jonathan]
-        const leaves = whitelisted.map(account => keccak256(account.address))
+        // register allowlist
+        const allowlisted = [john, jonny, jonathan]
+        const leaves = allowlisted.map(account => keccak256(account.address))
         const tree = new MerkleTree(leaves, keccak256, { sort: true })
         const root = tree.getHexRoot()
-        await instance.setWhitelist(root)
+        await instance.setAllowlist(root)
 
         // check balance to mint
-        const price: BigNumber = await instance.WHITELIST_PRICE()
-        const quantity: BigNumber = await instance.WHITELISTED_OWNER_MINT_LIMIT()
+        const price: BigNumber = await instance.ALLOWLIST_PRICE()
+        const quantity: BigNumber = await instance.ALLOWLISTED_OWNER_MINT_LIMIT()
         const totalPrice = price.mul(quantity)
         const balance = await jonathan.getBalance()
         expect(balance.gte(totalPrice)).is.true
 
         const proofOfJonathan = tree.getHexProof(keccak256(jonathan.address))
-        await expect(instance.connect(jonathan).whitelistMint(quantity, false, proofOfJonathan, { value: totalPrice })).to.revertedWith("whitelist mint: paused")
+        await expect(instance.connect(jonathan).allowlistMint(quantity, false, proofOfJonathan, { value: totalPrice })).to.revertedWith("allowlist mint: paused")
     })
 })

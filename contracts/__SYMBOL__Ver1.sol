@@ -32,7 +32,7 @@ contract __SYMBOL__Ver1 is
         mintLimit = $$mint limit$$;
         isChiefMintPaused = false;
         isPublicMintPaused = true;
-        isWhitelistMintPaused = true;
+        isAllowlistMintPaused = true;
         _royaltyFraction = $$royalty fraction in percentage$$00; // $$royalty fraction in percentage$$%
     }
 
@@ -118,23 +118,23 @@ contract __SYMBOL__Ver1 is
     ///////////////////////////////////////////////////////////////////
 
     //////////////////////////////////
-    //// Whitelist Mint
+    //// Allowlist Mint
     //////////////////////////////////
 
-    function whitelistMint(
+    function allowlistMint(
         uint256 quantity,
         bool claimBonus,
         bytes32[] calldata merkleProof
     )
         external
         payable
-        whenWhitelistMintNotPaused
+        whenAllowlistMintNotPaused
         checkMintLimit(quantity)
-        checkWhitelist(merkleProof)
-        checkWhitelistMintLimit(quantity)
-        checkPay(WHITELIST_PRICE, quantity)
+        checkAllowlist(merkleProof)
+        checkAllowlistMintLimit(quantity)
+        checkPay(ALLOWLIST_PRICE, quantity)
     {
-        _incrementNumberWhitelistMinted(msg.sender, quantity); // bonus is not included in the count
+        _incrementNumberAllowlistMinted(msg.sender, quantity); // bonus is not included in the count
         _safeMint(msg.sender, claimBonus ? bonusQuantity(quantity) : quantity);
     }
 
@@ -206,7 +206,7 @@ contract __SYMBOL__Ver1 is
     //// Pricing
     ///////////////////////////////////////////////////////////////////
 
-    uint256 public constant WHITELIST_PRICE = $$allowlist price in ether$$ ether;
+    uint256 public constant ALLOWLIST_PRICE = $$allowlist price in ether$$ ether;
     uint256 public constant PUBLIC_PRICE = $$public price in ether$$ ether;
 
     modifier checkPay(uint256 price, uint256 quantity) {
@@ -234,39 +234,39 @@ contract __SYMBOL__Ver1 is
     }
 
     ///////////////////////////////////////////////////////////////////
-    //// Whitelist
+    //// Allowlist
     ///////////////////////////////////////////////////////////////////
 
-    uint256 public constant WHITELISTED_OWNER_MINT_LIMIT = $$allowlist mint limit per owner$$;
+    uint256 public constant ALLOWLISTED_OWNER_MINT_LIMIT = $$allowlist mint limit per owner$$;
 
     bytes32 private _merkleRoot;
 
-    function setWhitelist(bytes32 merkleRoot) external onlyOwner {
+    function setAllowlist(bytes32 merkleRoot) external onlyOwner {
         _merkleRoot = merkleRoot;
     }
 
-    function isWhitelisted(bytes32[] calldata merkleProof) public view returns (bool) {
+    function isAllowlisted(bytes32[] calldata merkleProof) public view returns (bool) {
         return merkleProof.verify(_merkleRoot, keccak256(abi.encodePacked(msg.sender)));
     }
 
-    modifier checkWhitelist(bytes32[] calldata merkleProof) {
-        require(isWhitelisted(merkleProof), "invalid merkle proof");
+    modifier checkAllowlist(bytes32[] calldata merkleProof) {
+        require(isAllowlisted(merkleProof), "invalid merkle proof");
         _;
     }
 
-    modifier checkWhitelistMintLimit(uint256 quantity) {
+    modifier checkAllowlistMintLimit(uint256 quantity) {
         require(
-            numberWhitelistMinted(msg.sender) + quantity <= WHITELISTED_OWNER_MINT_LIMIT,
+            numberAllowlistMinted(msg.sender) + quantity <= ALLOWLISTED_OWNER_MINT_LIMIT,
             "WL minting exceeds the limit"
         );
         _;
     }
 
     ///////////////////////////////////////////////////////////////////
-    //// Whitelist Bonus
+    //// Allowlist Bonus
     ///////////////////////////////////////////////////////////////////
 
-    uint256 public constant WHITELIST_BONUS_PER = $$allowlist mint bonus per$$;
+    uint256 public constant ALLOWLIST_BONUS_PER = $$allowlist mint bonus per$$;
 
     /**
      * @dev returns baseQuantity + bonus.
@@ -274,7 +274,7 @@ contract __SYMBOL__Ver1 is
     function bonusQuantity(uint256 baseQuantity) public view returns (uint256) {
         uint256 totalMinted = _totalMinted();
         require(totalMinted + baseQuantity <= mintLimit, "minting exceeds the limit");
-        uint256 bonus = baseQuantity / WHITELIST_BONUS_PER;
+        uint256 bonus = baseQuantity / ALLOWLIST_BONUS_PER;
         uint256 bonusAdded = baseQuantity + bonus;
         // unfortunately if there are not enough stocks, you can't earn full bonus!
         return totalMinted + bonusAdded > mintLimit ? mintLimit - totalMinted : bonusAdded;
@@ -288,8 +288,8 @@ contract __SYMBOL__Ver1 is
     event ChiefMintUnpaused();
     event PublicMintPaused();
     event PublicMintUnpaused();
-    event WhitelistMintPaused();
-    event WhitelistMintUnpaused();
+    event AllowlistMintPaused();
+    event AllowlistMintUnpaused();
 
     //////////////////////////////////
     //// Chief Mint
@@ -344,28 +344,28 @@ contract __SYMBOL__Ver1 is
     }
 
     //////////////////////////////////
-    //// Whitelist Mint
+    //// Allowlist Mint
     //////////////////////////////////
 
-    function pauseWhitelistMint() external onlyOwner whenWhitelistMintNotPaused {
-        isWhitelistMintPaused = true;
-        emit WhitelistMintPaused();
+    function pauseAllowlistMint() external onlyOwner whenAllowlistMintNotPaused {
+        isAllowlistMintPaused = true;
+        emit AllowlistMintPaused();
     }
 
-    function unpauseWhitelistMint() external onlyOwner whenWhitelistMintPaused {
-        isWhitelistMintPaused = false;
-        emit WhitelistMintUnpaused();
+    function unpauseAllowlistMint() external onlyOwner whenAllowlistMintPaused {
+        isAllowlistMintPaused = false;
+        emit AllowlistMintUnpaused();
     }
 
-    bool public isWhitelistMintPaused;
+    bool public isAllowlistMintPaused;
 
-    modifier whenWhitelistMintNotPaused() {
-        require(!isWhitelistMintPaused, "whitelist mint: paused");
+    modifier whenAllowlistMintNotPaused() {
+        require(!isAllowlistMintPaused, "allowlist mint: paused");
         _;
     }
 
-    modifier whenWhitelistMintPaused() {
-        require(isWhitelistMintPaused, "whitelist mint: not paused");
+    modifier whenAllowlistMintPaused() {
+        require(isAllowlistMintPaused, "allowlist mint: not paused");
         _;
     }
 
@@ -375,20 +375,20 @@ contract __SYMBOL__Ver1 is
 
     uint64 private constant _AUX_BITMASK_ADDRESS_DATA_ENTRY = (1 << 16) - 1;
     uint64 private constant _AUX_BITPOS_NUMBER_CHIEF_MINTED = 0;
-    uint64 private constant _AUX_BITPOS_NUMBER_WHITELIST_MINTED = 16;
+    uint64 private constant _AUX_BITPOS_NUMBER_ALLOWLIST_MINTED = 16;
 
     //////////////////////////////////
-    //// Whitelist Mint
+    //// Allowlist Mint
     //////////////////////////////////
 
-    function numberWhitelistMinted(address owner) public view returns (uint256) {
-        return (_getAux(owner) >> _AUX_BITPOS_NUMBER_WHITELIST_MINTED) & _AUX_BITMASK_ADDRESS_DATA_ENTRY;
+    function numberAllowlistMinted(address owner) public view returns (uint256) {
+        return (_getAux(owner) >> _AUX_BITPOS_NUMBER_ALLOWLIST_MINTED) & _AUX_BITMASK_ADDRESS_DATA_ENTRY;
     }
 
-    function _incrementNumberWhitelistMinted(address owner, uint256 quantity) private {
-        require(numberWhitelistMinted(owner) + quantity <= _AUX_BITMASK_ADDRESS_DATA_ENTRY, "quantity overflow");
+    function _incrementNumberAllowlistMinted(address owner, uint256 quantity) private {
+        require(numberAllowlistMinted(owner) + quantity <= _AUX_BITMASK_ADDRESS_DATA_ENTRY, "quantity overflow");
         uint64 one = 1;
-        uint64 aux = _getAux(owner) + uint64(quantity) * ((one << _AUX_BITPOS_NUMBER_WHITELIST_MINTED) | one);
+        uint64 aux = _getAux(owner) + uint64(quantity) * ((one << _AUX_BITPOS_NUMBER_ALLOWLIST_MINTED) | one);
         _setAux(owner, aux);
     }
 

@@ -16,7 +16,7 @@ async function main() {
   await instance.deployed()
   console.log("proxy deployed to: ", instance.address)
 
-  // await instance.setWhitelist(createMerkleRoot(whitelistedAddresses))
+  // await instance.setAllowlist(createMerkleRoot(allowlistedAddresses))
 
   await instance.setChiefList(createMerkleRoot(chiefAddresses))
   await instance.setDistribution(chiefAddresses, 1_000)

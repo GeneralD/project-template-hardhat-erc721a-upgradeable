@@ -3,7 +3,7 @@ import { ethers } from 'hardhat'
 import { Latest__SYMBOL__, latest__SYMBOL__Factory } from '../libs/const'
 import { createMerkleRoot } from '../libs/createMerkleRoot'
 import { deployedProxy } from '../libs/deployedProxy'
-import { whitelistedAddresses } from '../libs/envs'
+import { allowlistedAddresses } from '../libs/envs'
 
 async function main() {
     const __SYMBOL__ = await latest__SYMBOL__Factory
@@ -11,7 +11,7 @@ async function main() {
 
     const [deployer] = await ethers.getSigners()
     let nonce = await ethers.provider.getTransactionCount(deployer.address)
-    await instance.setWhitelist(createMerkleRoot(whitelistedAddresses), { nonce: nonce++ })
+    await instance.setAllowlist(createMerkleRoot(allowlistedAddresses), { nonce: nonce++ })
 }
 
 main().catch(error => {
