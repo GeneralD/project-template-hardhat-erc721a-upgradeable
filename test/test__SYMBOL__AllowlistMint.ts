@@ -91,7 +91,7 @@ describe("Mint __SYMBOL__ as allowlisted member", () => {
         expect(await instance.numberAllowlistMinted(jonathan.address)).to.equal(quantity)
 
         // try to mint more and fail
-        await expect(instance.connect(jonathan).allowlistMint(quantity, false, proofOfJonathan, { value: totalPrice })).to.revertedWith("WL minting exceeds the limit")
+        await expect(instance.connect(jonathan).allowlistMint(quantity, false, proofOfJonathan, { value: totalPrice })).to.revertedWith("allowlist minting exceeds the limit")
 
         // but other guy is still ok
         const proofOfJonny = tree.getHexProof(keccak256(jonny.address))
